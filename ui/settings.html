@@ -112,7 +112,7 @@ input[type="time"]{font:inherit; font-size:12.5px; color:var(--ink); background:
         <span></span><div class="bar"><i id="bTime"></i></div><span></span>
         <span></span><span class="w" id="wTime">weight 1.00</span>
       </div>
-      <p class="notice" id="keysNotice" hidden>To notice slower typing, Rally needs Accessibility access: System Settings → Privacy &amp; Security → Accessibility → turn on Rally. Pauses are detected without it. Rally only counts key presses, never which keys.</p>
+      <div class="notice" id="keysNotice" hidden><p style="margin:0 0 8px">Optional: to also notice slower typing, Rally needs Accessibility access on Mac. Pauses are detected without it. Rally only counts key presses, never which keys.</p><button class="btn" id="keysBtn">Allow typing detection…</button></div>
       <p class="hint">Rally notices when your workday starts, then watches the last hour. Pauses of 3–20 minutes count; a single long break like lunch is ignored. With 3 or more pauses, or slower typing in the afternoon slump, you get one quote that day: weekdays only, never before 9 am, and only once you're back at the keyboard.</p>
     </div>
 
@@ -219,6 +219,7 @@ async function refresh(){
 setInterval(refresh, 1000); refresh();
 
 $("showBtn").onclick = () => invoke("show_now");
+$("keysBtn").onclick = () => invoke("request_keys_access").then(() => toast("In System Settings, turn on Rally under Accessibility. Rally picks it up within a few seconds."));
 $("resetBtn").onclick = () => invoke("reset_today").then(() => { toast("Today reset: workday, last hour and popup count start fresh."); refresh(); });
 $("resetPosBtn").onclick = () => invoke("reset_popup_position").then(() => toast("The popup will appear in the bottom-right corner again."));
 $("testMode").onchange = e => invoke("set_test_mode", {on: e.target.checked}).then(refresh);

@@ -1,6 +1,6 @@
 [package]
 name = "rally"
-version = "1.0.0"
+version = "1.0.1"
 description = "Rally: a motivational quote when you need it"
 edition = "2021"
 
@@ -24,3 +24,6 @@ lto = true
 opt-level = "s"
 panic = "abort"
 strip = true
+
+[target.'cfg(target_os = "macos")'.dependencies]
+macos-accessibility-client = "0.0.1"

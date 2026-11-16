@@ -30,6 +30,18 @@ type Eng<'a> = State<'a, Arc<Engine>>;
     a.is_enabled().unwrap_or(false)
 }
 
+/// Typing detection needs Accessibility access on macOS. Check quietly; only ask when the user chooses to.
+fn keys_allowed(prompt: bool) -> bool {
+    #[cfg(target_os = "macos")]
+    {
+        use macos_accessibility_client::accessibility::{application_is_trusted, application_is_trusted_with_prompt};
+        return if prompt { application_is_trusted_with_prompt() } else { application_is_trusted() };
+    }
+    #[cfg(not(target_os = "macos"))]
+    { let _ = prompt; true }
+}
+#[tauri::command] fn request_keys_access() -> bool { keys_allowed(true) }
+
 /// Bottom-right corner of the main screen, above the taskbar/dock.
 fn place_default(w: &WebviewWindow) {
     let size = PhysicalSize::new(400u32, 470u32);
@@ -75,7 +87,8 @@ fn start_watchers(app: AppHandle, eng: Arc<Engine>) {
     let e1 = eng.clone();
     std::thread::spawn(move || {
         use device_query::{DeviceQuery, DeviceState, Keycode};
-        let ds = DeviceState::checked_new(); // None on macOS until Accessibility access is granted
+        // Only create the key reader once access is already granted (never prompts by itself)
+        let ds = if keys_allowed(false) { DeviceState::checked_new() } else { None };
         e1.set_keys_ok(ds.is_some());
         let mut prev: Vec<Keycode> = vec![];
         let mut last_mark = 0u128;
@@ -96,7 +109,7 @@ fn start_watchers(app: AppHandle, eng: Arc<Engine>) {
                 }
                 None => { // check again now and then (the user may grant access later)
                     retry += 1;
-                    if retry % 300 == 0 { ds = DeviceState::checked_new(); e1.set_keys_ok(ds.is_some()); }
+                    if retry % 300 == 0 && keys_allowed(false) { ds = DeviceState::checked_new(); e1.set_keys_ok(ds.is_some()); }
                 }
             }
         }
@@ -124,7 +137,7 @@ fn main() {
             .build())
         .invoke_handler(tauri::generate_handler![
             status, set_mode, set_sched, set_test_mode, reset_today, snooze, react,
-            show_now, hide_popup, reset_popup_position, get_autostart, set_autostart
+            show_now, hide_popup, reset_popup_position, get_autostart, set_autostart, request_keys_access
         ])
         .setup(|app| {
             #[cfg(target_os = "macos")]
