@@ -149,7 +149,8 @@ $("downBtn").onclick = () => react(false);
 $("reportBtn").onclick = () => { if(reportCurrent()) toast("Reported. This quote won't show again."); };
 
 /* ---------- move and resize the window by dragging the card or its edges ---------- */
-const EDGE = 10, CORNER = 22;
+const EDGE = 14, CORNER = 28, MIN_W = 300, MIN_H = 300;
+const isMac = /Mac/i.test(navigator.platform || navigator.userAgent);
 function edgeAt(e){
   const w = innerWidth, h = innerHeight, x = e.clientX, y = e.clientY;
   const nearL = x < CORNER, nearR = x > w - CORNER, nearT = y < CORNER, nearB = y > h - CORNER;
@@ -159,11 +160,39 @@ function edgeAt(e){
   return null;
 }
 const CURSORS = {North:"ns-resize", South:"ns-resize", East:"ew-resize", West:"ew-resize", NorthEast:"nesw-resize", SouthWest:"nesw-resize", NorthWest:"nwse-resize", SouthEast:"nwse-resize"};
-document.addEventListener("pointermove", e => { const d = edgeAt(e); $("pop").style.cursor = d ? CURSORS[d] : ""; });
+let rs = null; // manual resize in progress (macOS has no native resize-drag for frameless windows)
+document.addEventListener("pointermove", e => {
+  if(rs){ rs.x = e.screenX; rs.y = e.screenY; if(!rs.raf) rs.raf = requestAnimationFrame(applyResize); return; }
+  const d = edgeAt(e); document.body.style.cursor = d ? CURSORS[d] : ""; $("pop").style.cursor = d ? CURSORS[d] : "";
+});
+async function startManualResize(e, d){
+  const scale = await win.scaleFactor();
+  const pos = (await win.outerPosition()).toLogical(scale), size = (await win.innerSize()).toLogical(scale);
+  rs = {d, sx:e.screenX, sy:e.screenY, x:e.screenX, y:e.screenY, px:pos.x, py:pos.y, w:size.width, h:size.height, raf:0};
+  try{ document.body.setPointerCapture(e.pointerId); }catch(err){}
+}
+function applyResize(){
+  if(!rs) return; rs.raf = 0;
+  const dx = rs.x - rs.sx, dy = rs.y - rs.sy, d = rs.d;
+  let x = rs.px, y = rs.py, w = rs.w, h = rs.h;
+  if(d.includes("East")) w = Math.max(MIN_W, rs.w + dx);
+  if(d.includes("South")) h = Math.max(MIN_H, rs.h + dy);
+  if(d.includes("West")){ w = Math.max(MIN_W, rs.w - dx); x = rs.px + (rs.w - w); }
+  if(d.includes("North")){ h = Math.max(MIN_H, rs.h - dy); y = rs.py + (rs.h - h); }
+  const D = T.dpi;
+  win.setSize(new D.LogicalSize(Math.round(w), Math.round(h)));
+  if(x !== rs.px || y !== rs.py) win.setPosition(new D.LogicalPosition(Math.round(x), Math.round(y)));
+}
+function endManualResize(){ if(rs){ cancelAnimationFrame(rs.raf); applyResize(); rs = null; } }
+document.addEventListener("pointerup", endManualResize);
+document.addEventListener("pointercancel", endManualResize);
 document.addEventListener("pointerdown", e => {
   if(!win || e.button !== 0 || e.target.closest("button")) return;
   const d = edgeAt(e);
-  if(d) win.startResizeDragging(d); else win.startDragging();
+  if(!d){ win.startDragging(); return; }
+  e.preventDefault();
+  if(isMac) startManualResize(e, d);
+  else win.startResizeDragging(d).catch(() => startManualResize(e, d));
 });
 </script>
 </body>
