@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rally</title>
+<link rel="stylesheet" href="common.css">
+<style>
+body{
+  background:
+    radial-gradient(70% 45% at 85% 100%, color-mix(in srgb,#c98a5b 45%, transparent), transparent 70%),
+    radial-gradient(60% 50% at 10% 0%, color-mix(in srgb,#5d7f9e 45%, transparent), transparent 70%),
+    linear-gradient(160deg,#2c394b,#1a2331 60%);
+  background-attachment:fixed; background-color:#1a2331; min-height:100%; height:auto;
+  overflow-y:auto;
+}
+main{max-width:460px; margin:0 auto; padding:20px 18px 40px; display:grid; gap:16px}
+header{display:flex; align-items:center; gap:12px}
+header img{width:40px; height:40px}
+header h1{margin:0; font:400 30px/1 var(--f-quote)}
+header p{margin:2px 0 0; font-size:12px; color:var(--ink-faint)}
+.card{background:rgba(18,24,33,.62); border:1px solid rgba(255,255,255,.10); border-radius:14px; padding:16px; display:grid; gap:14px}
+.card h2{margin:0; font-size:12px; font-weight:500; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint)}
+.score{display:flex; align-items:baseline; gap:10px}
+.score-num{font-family:var(--f-mono); font-size:40px; font-weight:500; font-variant-numeric:tabular-nums; line-height:1}
+.score-label{font-size:12px; color:var(--ink-faint)}
+.meter{height:6px; border-radius:3px; background:rgba(255,255,255,.08); overflow:hidden; position:relative; margin-top:8px}
+.meter i{position:absolute; inset:0 auto 0 0; width:0; background:linear-gradient(90deg,var(--good),var(--warn),var(--hot)); border-radius:3px; transition:width .6s}
+.meter .thr{position:absolute; top:-3px; bottom:-3px; width:2px; left:55%; background:var(--ink); opacity:.6}
+.sig{display:grid; grid-template-columns:auto 1fr auto; gap:4px 12px; align-items:center; font-size:13px}
+.sig .k{color:var(--ink-soft)}
+.sig .v{font-family:var(--f-mono); font-size:12px; font-variant-numeric:tabular-nums; text-align:right}
+.sig .bar{height:4px; background:rgba(255,255,255,.08); border-radius:2px; overflow:hidden}
+.sig .bar i{display:block; height:100%; width:0; background:var(--warn); transition:width .6s}
+.sig .w{grid-column:2 / 4; font-size:11px; color:var(--ink-faint); margin-top:-2px}
+.row{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.pill{font-family:var(--f-mono); font-size:11px; padding:4px 8px; border-radius:99px; background:rgba(255,255,255,.08); color:var(--ink-soft)}
+.pill.on{background:color-mix(in srgb,var(--good) 25%, transparent); color:var(--good)}
+.pill.off{background:color-mix(in srgb,var(--hot) 22%, transparent); color:var(--hot)}
+.btn{border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.07); padding:7px 12px; border-radius:9px; font-size:12.5px}
+.btn:hover{background:rgba(255,255,255,.13)}
+.btn.primary{background:var(--ink); color:#1b2330; border-color:transparent; font-weight:500}
+.btn.primary:hover{background:#fff}
+.toggle{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-soft)}
+.toggle input{accent-color:#f3f1ee; width:15px; height:15px}
+.hint{font-size:11.5px; line-height:1.5; color:var(--ink-faint); margin:0}
+.notice{font-size:12px; line-height:1.5; color:var(--warn); background:color-mix(in srgb,var(--warn) 12%, transparent); border-radius:10px; padding:10px 12px; margin:0}
+.seg{display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:4px; border-radius:11px; background:rgba(255,255,255,.06)}
+.seg button{border:0; background:none; padding:8px; border-radius:8px; font-size:13px; color:var(--ink-soft)}
+.seg button[aria-checked="true"]{background:rgba(255,255,255,.16); color:var(--ink)}
+.strip-head{display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink-faint); margin-bottom:6px}
+.strip{display:grid; grid-template-columns:repeat(60,1fr); gap:1px; height:16px}
+.strip i{border-radius:1px; background:rgba(255,255,255,.05)}
+.strip .s-on{background:var(--good)} .strip .s-pause{background:var(--warn)} .strip .s-long{background:rgba(255,255,255,.22)}
+.strip .s-idle{background:rgba(255,255,255,.10)} .strip .s-old{background:color-mix(in srgb,var(--good) 35%, transparent)} .strip .s-oldidle{background:rgba(255,255,255,.07)}
+.strip-key{display:flex; flex-wrap:wrap; gap:4px 12px; font-size:11px; color:var(--ink-faint); margin-top:6px}
+.strip-key i{display:inline-block; width:8px; height:8px; border-radius:2px; margin-right:5px; vertical-align:-1px}
+.k-on{background:var(--good)} .k-pause{background:var(--warn)} .k-long{background:rgba(255,255,255,.22)}
+.k-title{font-size:12px; color:var(--ink-soft)}
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.chip{display:inline-flex; align-items:center; gap:6px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); padding:5px 10px; border-radius:99px; font-size:12px; color:var(--ink-soft)}
+.chip.on{background:rgba(255,255,255,.16); color:var(--ink)}
+.chip button{border:0; background:none; padding:0; font-size:11px; color:var(--ink-faint)}
+input[type="time"]{font:inherit; font-size:12.5px; color:var(--ink); background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); border-radius:8px; padding:5px 8px; color-scheme:dark}
+.modal{position:fixed; inset:0; z-index:40; display:grid; place-items:center; padding:20px; background:rgba(8,10,14,.6)}
+.modal-card{width:min(640px,100%); max-height:85vh; display:flex; flex-direction:column; border-radius:18px; overflow:hidden; background:#1c222c; box-shadow:inset 0 0 0 1px rgba(255,255,255,.14), 0 24px 60px rgba(0,0,0,.5)}
+.modal-head{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 14px 12px 20px; border-bottom:1px solid rgba(255,255,255,.08)}
+.modal-head h2{margin:0; font:400 24px/1.1 var(--f-quote)}
+.modal-body{overflow-y:auto; padding:12px 20px 20px; font-size:13px; line-height:1.55; color:var(--ink-soft)}
+.modal-body p{margin:0 0 10px}
+.list{list-style:none; margin:10px 0 0; padding:0}
+.list li{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:2px 12px; padding:9px 0; border-top:1px solid rgba(255,255,255,.07)}
+.list .who,.list .q{color:var(--ink)}
+.list .lic{font-family:var(--f-mono); font-size:11px; color:var(--ink-faint); text-align:right; white-space:nowrap}
+.list .file{grid-column:1 / 3; font-size:12px; color:var(--ink-faint); overflow-wrap:anywhere}
+.list .btn{grid-row:1 / 3; grid-column:2; align-self:center}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="icon.png" alt="">
+    <div><h1>Rally</h1><p>A quote when you need a push. Runs quietly in the tray.</p></div>
+  </header>
+
+  <section class="card">
+    <h2>When quotes appear</h2>
+    <div class="seg" role="radiogroup" aria-label="When quotes appear">
+      <button role="radio" data-mode="auto" aria-checked="true">🤖 Automatic</button>
+      <button role="radio" data-mode="sched" aria-checked="false">🕘 Scheduled</button>
+    </div>
+    <div class="row"><span class="pill" id="dayPill">–</span><span class="pill" id="clockPill">–</span></div>
+
+    <div id="autoBox" style="display:grid; gap:14px">
+      <div>
+        <div class="score"><span class="score-num" id="scoreNum">0</span><span class="score-label">slump score · a quote appears at 55</span></div>
+        <div class="meter"><i id="scoreBar"></i><span class="thr"></span></div>
+      </div>
+      <div>
+        <div class="strip-head"><span>Last hour</span><span id="stripNote">–</span></div>
+        <div class="strip" id="strip" aria-hidden="true"></div>
+        <div class="strip-key"><span><i class="k-on"></i>working</span><span><i class="k-pause"></i>pause (counts)</span><span><i class="k-long"></i>long break (ignored)</span></div>
+      </div>
+      <div class="sig">
+        <span>⏸️</span><span class="k">Pauses, last hour</span><span class="v" id="vIdle">–</span>
+        <span></span><div class="bar"><i id="bIdle"></i></div><span></span>
+        <span></span><span class="w" id="wIdle">weight 1.00</span>
+        <span>⌨️</span><span class="k">Typing, last hour</span><span class="v" id="vType">–</span>
+        <span></span><div class="bar"><i id="bType"></i></div><span></span>
+        <span></span><span class="w" id="wType">weight 1.00</span>
+        <span>🕑</span><span class="k">Time of day</span><span class="v" id="vTime">–</span>
+        <span></span><div class="bar"><i id="bTime"></i></div><span></span>
+        <span></span><span class="w" id="wTime">weight 1.00</span>
+      </div>
+      <p class="notice" id="keysNotice" hidden>To notice slower typing, Rally needs Accessibility access: System Settings → Privacy &amp; Security → Accessibility → turn on Rally. Pauses are detected without it. Rally only counts key presses, never which keys.</p>
+      <p class="hint">Rally notices when your workday starts, then watches the last hour. Pauses of 3–20 minutes count; a single long break like lunch is ignored. With 3 or more pauses, or slower typing in the afternoon slump, you get one quote that day: weekdays only, never before 9 am, and only once you're back at the keyboard.</p>
+    </div>
+
+    <div id="schedBox" style="display:grid; gap:12px" hidden>
+      <div class="k-title">Popup times</div>
+      <div class="chips" id="timeList"></div>
+      <div class="row"><input type="time" id="timeInput" value="10:30" aria-label="New popup time"><button class="btn" id="addTimeBtn">Add time</button></div>
+      <div class="k-title">Days</div>
+      <div class="chips" id="dayChips"></div>
+      <p class="hint" id="nextNote">–</p>
+      <p class="hint">A quote appears at each time you set. If you're away, it waits until you're back (up to 30 minutes) and otherwise skips.</p>
+    </div>
+
+    <div class="row"><span class="pill" id="countPill">–</span><span class="pill" id="statusPill">–</span></div>
+  </section>
+
+  <section class="card">
+    <h2>Quotes</h2>
+    <div class="row">
+      <button class="btn primary" id="showBtn">Show a quote now</button>
+      <button class="btn" id="reportsBtn">Reported quotes (0)</button>
+      <button class="btn" id="creditsBtn">About &amp; credits</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Options</h2>
+    <label class="toggle"><input type="checkbox" id="autostart"> Start Rally with my computer</label>
+    <label class="toggle"><input type="checkbox" id="testMode"> Test mode (an hour passes in 2 minutes)</label>
+    <div class="row">
+      <button class="btn" id="resetBtn">Reset today</button>
+      <button class="btn" id="resetPosBtn">Reset popup position</button>
+    </div>
+    <p class="hint">Closing this window keeps Rally running in the tray (menu bar on Mac). Use the tray menu to quit. Rally works offline, and only measures timing: never what you type.</p>
+  </section>
+</main>
+
+<div class="modal" id="reports" role="dialog" aria-modal="true" aria-labelledby="reportsTitle" hidden>
+  <div class="modal-card">
+    <div class="modal-head"><h2 id="reportsTitle">Reported quotes</h2><button class="glass-btn close" data-close="reports" aria-label="Close">✕</button></div>
+    <div class="modal-body">
+      <p id="reportsNote"></p>
+      <div class="row"><button class="btn" id="copyReports">Copy list</button></div>
+      <ul class="list" id="reportList"></ul>
+    </div>
+  </div>
+</div>
+<div class="modal" id="credits" role="dialog" aria-modal="true" aria-labelledby="creditsTitle" hidden>
+  <div class="modal-card">
+    <div class="modal-head"><h2 id="creditsTitle">About &amp; credits</h2><button class="glass-btn close" data-close="credits" aria-label="Close">✕</button></div>
+    <div class="modal-body">
+      <p>Every quote was found word for word in its original source: the book, letter or speech it comes from, in a public-domain edition or translation where possible. A second, independent check confirmed the wording, author, source and date.</p>
+      <p>Portraits come from Wikimedia Commons, under the licence shown. Where no free portrait exists, the picture is an AI-generated painting in the style of the person's era, showing their world or work, and is marked as such below.</p>
+      <ul class="list" id="creditList"></ul>
+    </div>
+  </div>
+</div>
+<div class="toast hide" id="toast"></div>
+
+<script src="data.js"></script>
+<script src="quotes.js"></script>
+<script>
+const T = window.__TAURI__, invoke = T ? T.core.invoke : async () => null;
+const DAYN = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+let sched = null;
+const fmtT = t => { const [h,m] = t.split(":").map(Number); return ((h+11)%12+1) + ":" + String(m).padStart(2,"0") + (h >= 12 ? " pm" : " am"); };
+
+function renderSched(){
+  const t = sched.times.slice().sort();
+  $("timeList").innerHTML = t.length ? t.map(x => '<span class="chip on">' + fmtT(x) + '<button aria-label="Remove ' + x + '" data-t="' + x + '">✕</button></span>').join("") : '<span class="hint">No times yet. Add one below.</span>';
+  $("dayChips").innerHTML = [1,2,3,4,5,6,0].map(d => '<button class="chip' + (sched.days.includes(d) ? " on" : "") + '" data-d="' + d + '" aria-pressed="' + sched.days.includes(d) + '">' + DAYN[d] + '</button>').join("");
+}
+function saveSched(){ invoke("set_sched", {times: sched.times, days: sched.days}); renderSched(); }
+$("timeList").addEventListener("click", e => { const t = e.target.dataset.t; if(!t) return; sched.times = sched.times.filter(x => x !== t); saveSched(); });
+$("dayChips").addEventListener("click", e => { const d = e.target.dataset.d; if(d == null) return; const n = +d; sched.days = sched.days.includes(n) ? sched.days.filter(x => x !== n) : sched.days.concat(n); saveSched(); });
+$("addTimeBtn").onclick = () => { const v = $("timeInput").value; if(!v || sched.times.includes(v)) return; sched.times.push(v); saveSched(); };
+
+function setModeUI(m){
+  document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-checked", b.dataset.mode === m));
+  $("autoBox").hidden = m !== "auto"; $("schedBox").hidden = m !== "sched";
+}
+document.querySelectorAll(".seg button").forEach(b => b.onclick = () => { setModeUI(b.dataset.mode); invoke("set_mode", {mode: b.dataset.mode}).then(refresh); });
+
+async function refresh(){
+  const s = await invoke("status"); if(!s) return;
+  if(!sched){ sched = s.sched; renderSched(); }
+  setModeUI(s.mode);
+  $("testMode").checked = s.test_mode;
+  $("dayPill").textContent = s.day; $("dayPill").className = "pill" + (s.day_on ? " on" : "");
+  $("clockPill").textContent = s.clock;
+  $("scoreNum").textContent = s.score; $("scoreBar").style.width = s.score + "%";
+  $("vIdle").textContent = s.idle_label; $("bIdle").style.width = Math.min(100, s.idle*100/1.4) + "%";
+  $("vType").textContent = s.typing_label; $("bType").style.width = (s.typing*100) + "%";
+  $("vTime").textContent = s.time_label; $("bTime").style.width = (s.time*100) + "%";
+  ["wIdle","wType","wTime"].forEach((id, i) => $(id).textContent = "weight " + s.weights[i].toFixed(2));
+  $("strip").innerHTML = s.cells.map(x => '<i class="s-' + x + '"></i>').join("");
+  $("stripNote").textContent = s.strip_note;
+  $("countPill").textContent = s.count;
+  $("statusPill").textContent = s.status; $("statusPill").className = "pill" + (s.status_on ? " on" : "");
+  $("nextNote").textContent = s.next;
+  $("keysNotice").hidden = s.keys_ok;
+  repCount();
+}
+setInterval(refresh, 1000); refresh();
+
+$("showBtn").onclick = () => invoke("show_now");
+$("resetBtn").onclick = () => invoke("reset_today").then(() => { toast("Today reset: workday, last hour and popup count start fresh."); refresh(); });
+$("resetPosBtn").onclick = () => invoke("reset_popup_position").then(() => toast("The popup will appear in the bottom-right corner again."));
+$("testMode").onchange = e => invoke("set_test_mode", {on: e.target.checked}).then(refresh);
+invoke("get_autostart").then(on => $("autostart").checked = !!on);
+$("autostart").onchange = e => invoke("set_autostart", {on: e.target.checked}).then(on => { $("autostart").checked = !!on; toast(on ? "Rally will start with your computer." : "Rally won't start by itself."); });
+
+/* ---------- reported quotes ---------- */
+function repCount(){ loadReports(); $("reportsBtn").textContent = "Reported quotes (" + Object.keys(REP).length + ")"; }
+function sortedReports(){ loadReports(); return Object.keys(REP).sort((a,b) => (REP[b].at || "").localeCompare(REP[a].at || "")); }
+function renderReports(){
+  const ks = sortedReports();
+  $("reportsNote").textContent = ks.length ? "Quotes you flag with 🚩 stop showing. Undo puts one back. \"Copy list\" copies them all so you can paste them anywhere." : "Nothing reported yet. Hover a quote and press 🚩 to flag it.";
+  $("copyReports").hidden = !ks.length;
+  $("reportList").innerHTML = ks.map(k => '<li><span class="q">“' + esc(REP[k].text) + '”</span><button class="btn" data-k="' + k + '">Undo</button><span class="file">' + esc(REP[k].name) + '</span></li>').join("");
+}
+$("reportList").addEventListener("click", e => { const k = e.target.dataset && e.target.dataset.k; if(!k) return; loadReports(); delete REP[k]; store.set("reported", REP); renderReports(); repCount(); });
+$("copyReports").onclick = async () => {
+  const text = sortedReports().map((k, n) => (n+1) + '. "' + REP[k].text + '" — ' + REP[k].name + " [" + REP[k].g + "]").join("\n");
+  try{ await navigator.clipboard.writeText(text); }
+  catch(e){ const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); }
+  toast("Copied " + sortedReports().length + " reported quotes.");
+};
+$("reportsBtn").onclick = () => { renderReports(); $("reports").hidden = false; };
+
+/* ---------- credits ---------- */
+$("creditsBtn").onclick = () => {
+  $("creditList").innerHTML = Object.values(CREDITS).sort((a,b) => a.who.localeCompare(b.who)).map(c =>
+    '<li><span class="who">' + esc(c.who) + '</span><span class="lic">' + esc(c.lic) + '</span><span class="file">' + esc(c.file) + (c.by ? " · " + esc(c.by) : "") + '</span></li>').join("");
+  $("credits").hidden = false;
+};
+document.querySelectorAll("[data-close]").forEach(b => b.onclick = () => $(b.dataset.close).hidden = true);
+document.querySelectorAll(".modal").forEach(m => m.addEventListener("click", e => { if(e.target === m) m.hidden = true; }));
+addEventListener("keydown", e => { if(e.key === "Escape") document.querySelectorAll(".modal").forEach(m => m.hidden = true); });
+</script>
+</body>
+</html>

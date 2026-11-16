@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rally</title>
+<link rel="stylesheet" href="common.css">
+<style>
+html,body{background:transparent; overflow:hidden; user-select:none; -webkit-user-select:none}
+.pop{
+  position:fixed; inset:6px; border-radius:24px; overflow:hidden; isolation:isolate;
+  background:#161a21;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.12), inset 0 0 0 1px var(--glass-edge), 0 4px 10px rgba(0,0,0,.35);
+  display:flex; flex-direction:column; container-type:inline-size; cursor:grab;
+  transition:opacity .35s ease, transform .4s cubic-bezier(.2,.9,.25,1.15); transform-origin:100% 100%;
+}
+.pop.hide{opacity:0; transform:translateY(14px) scale(.97); pointer-events:none}
+.pop.fading{transition:opacity 1.6s ease, transform 1.6s ease}
+.pop button{cursor:pointer}
+.pop-bg{position:absolute; inset:0; z-index:-2; background:#20242c}
+.pop-bg img{width:100%; height:100%; object-fit:cover; object-position:50% 20%; filter:brightness(.85); opacity:.7; transition:opacity .5s; -webkit-user-drag:none}
+.pop-bg::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,12,16,.10) 0%, rgba(10,12,16,.35) 40%, rgba(10,12,16,.82) 100%)}
+.pop::before{content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:radial-gradient(120% 60% at 10% -10%, rgba(255,255,255,.28), transparent 45%), radial-gradient(80% 40% at 110% 110%, rgba(255,255,255,.10), transparent 60%)}
+.pop-top{display:flex; align-items:center; gap:8px; padding:14px 14px 0 16px; flex:none}
+.spacer{flex:1}
+.snooze{padding:0 11px; font-size:11.5px; color:var(--ink-soft); white-space:nowrap}
+.thumbs{display:inline-flex; gap:6px; flex:none}
+.thumb,.flag{width:30px; font-size:14px; padding:0}
+.flag{font-size:13px}
+.thumb[aria-pressed="true"]{background:rgba(255,255,255,.32)}
+.thumbs.gone{opacity:0!important; pointer-events:none}
+/* Extras appear on hover (or keyboard focus); a click doesn't pin them */
+.snooze,.thumbs,.flag{opacity:0; transform:translateX(6px); transition:opacity .25s, transform .25s, background .2s}
+.tabs{opacity:0; transform:translateY(6px); transition:opacity .25s, transform .25s}
+.pop:hover .snooze,.pop:hover .thumbs,.pop:hover .flag,.pop:hover .tabs,
+.pop:has(:focus-visible) .snooze,.pop:has(:focus-visible) .thumbs,.pop:has(:focus-visible) .flag,.pop:has(:focus-visible) .tabs{opacity:1; transform:none}
+.quote{padding:20px 22px 18px; min-height:0; flex:1 1 auto; overflow-y:auto; scrollbar-width:none; display:flex; flex-direction:column;
+  transform:translateY(48px); transition:opacity .25s, transform .45s cubic-bezier(.2,.8,.2,1)}
+.quote::-webkit-scrollbar{display:none}
+.pop:hover .quote,.pop:has(:focus-visible) .quote{transform:none}
+.quote > :first-child{margin-top:auto}
+.quote.swap{opacity:0}
+.q-text{font-family:var(--f-quote); font-size:clamp(20px, 6.6cqi, 44px); line-height:1.18; letter-spacing:-.005em; text-wrap:pretty; margin:0; text-shadow:0 1px 18px rgba(0,0,0,.45)}
+.q-text::before{content:"“"} .q-text::after{content:"”"}
+.q-who{margin-top:14px; display:flex; flex-direction:column; gap:3px}
+.q-name{font-size:14px; font-weight:600; letter-spacing:.01em}
+.q-meta{font-size:12px; color:var(--ink-soft)}
+.q-meta .date{font-family:var(--f-mono); font-size:11.5px; color:var(--ink)}
+.tabs{position:relative; margin:0 12px 12px; padding:5px; display:grid; grid-template-columns:repeat(5,1fr); flex:none;
+  border-radius:99px; background:rgba(255,255,255,.08); box-shadow:inset 0 1px 0 rgba(255,255,255,.25), inset 0 0 0 1px rgba(255,255,255,.14)}
+.tab-blob{position:absolute; top:5px; bottom:5px; left:5px; width:calc((100% - 10px)/5); border-radius:99px; background:rgba(255,255,255,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6), inset 0 -1px 0 rgba(255,255,255,.15), 0 2px 10px rgba(0,0,0,.25); transition:transform .45s cubic-bezier(.3,1.4,.4,1)}
+.tab{position:relative; z-index:1; border:0; background:none; height:38px; border-radius:99px; font-size:19px; line-height:1; filter:grayscale(.6) opacity(.75); transition:filter .2s, transform .15s}
+.tab:hover,.tab[aria-selected="true"]{filter:none}
+.tab:active{transform:scale(.9)}
+.fade-line{position:absolute; top:0; left:0; height:2px; width:100%; background:rgba(255,255,255,.55); transform-origin:left; z-index:2}
+.toast{bottom:70px}
+</style>
+</head>
+<body>
+<aside class="pop hide" id="pop" role="dialog" aria-label="Motivational quote" aria-live="polite">
+  <div class="fade-line" id="fadeLine"></div>
+  <div class="pop-bg"><img id="qImg" alt="" draggable="false"></div>
+  <div class="pop-top">
+    <span class="spacer"></span>
+    <button class="glass-btn flag" id="reportBtn" title="Report this quote: it won't show again" aria-label="Report this quote">🚩</button>
+    <span class="thumbs" id="react">
+      <button class="glass-btn thumb" id="upBtn" aria-pressed="false" title="Needed that" aria-label="Needed that">👍</button>
+      <button class="glass-btn thumb" id="downBtn" aria-pressed="false" title="Not now" aria-label="Not now">👎</button>
+    </span>
+    <button class="glass-btn snooze" id="snoozeBtn" title="No more quotes until tomorrow">Snooze today</button>
+    <button class="glass-btn close" id="closeBtn" aria-label="Close (Esc)" title="Close (Esc)">✕</button>
+  </div>
+  <div class="quote" id="quoteBox">
+    <p class="q-text" id="qText"></p>
+    <div class="q-who">
+      <span class="q-name" id="qName"></span>
+      <span class="q-meta"><span id="qSource"></span> · <span class="date" id="qDate"></span></span>
+    </div>
+  </div>
+  <div class="tabs" role="tablist" aria-label="Quote genre">
+    <span class="tab-blob" id="blob"></span>
+    <button class="tab" role="tab" data-g="business" title="Business" aria-label="Business">💼</button>
+    <button class="tab" role="tab" data-g="kind" title="Kind words" aria-label="Kind words">🌿</button>
+    <button class="tab" role="tab" data-g="history" title="History" aria-label="History">🚀</button>
+    <button class="tab" role="tab" data-g="ancient" title="Ancient Greece &amp; Rome" aria-label="Ancient Greece and Rome">🏛️</button>
+    <button class="tab" role="tab" data-g="mix" title="Mix: every genre, at random" aria-label="Mix of all genres">🎲</button>
+  </div>
+</aside>
+<div class="toast hide" id="toast"></div>
+<script src="data.js"></script>
+<script src="quotes.js"></script>
+<script>
+const T = window.__TAURI__, invoke = T ? T.core.invoke : async () => {}, win = T ? T.window.getCurrentWindow() : null;
+const FADE_MS = 5*60*1000;
+const P = {open:false, reacted:false};
+
+/* ---------- show / hide ---------- */
+function show(why){
+  P.open = true; P.reacted = false;
+  ["upBtn","downBtn"].forEach(id => $(id).setAttribute("aria-pressed","false"));
+  $("react").hidden = false; $("react").classList.remove("gone");
+  loadReports();
+  refreshViewedTabs();
+  setGenre(S.genre, false);
+  $("pop").classList.remove("fading","hide");
+  restartFade();
+}
+function hide(fade){
+  const p = $("pop");
+  p.classList.toggle("fading", !!fade); p.classList.add("hide");
+  P.open = false; clearTimeout(fadeTimer); cancelAnimationFrame(fadeRAF);
+  setTimeout(() => { if(!P.open) invoke("hide_popup"); }, fade ? 1600 : 300);
+}
+if(T) T.event.listen("show-quote", e => show(e.payload));
+else setTimeout(() => show("Preview"), 300); // opened in a plain browser
+
+/* ---------- auto-fade after 5 minutes, paused while hovered ---------- */
+let fadeTimer = null, fadeStart = 0, fadeLeft = FADE_MS, fadeRAF = null;
+function restartFade(){ fadeLeft = FADE_MS; runFade(); }
+function runFade(){
+  clearTimeout(fadeTimer); cancelAnimationFrame(fadeRAF);
+  fadeStart = Date.now();
+  fadeTimer = setTimeout(() => hide(true), fadeLeft);
+  const draw = () => {
+    const left = Math.max(0, fadeLeft - (Date.now() - fadeStart));
+    $("fadeLine").style.transform = "scaleX(" + (left / FADE_MS) + ")";
+    if(left > 0) fadeRAF = requestAnimationFrame(draw);
+  };
+  draw();
+}
+$("pop").addEventListener("pointerenter", () => { if(!P.open) return; fadeLeft = Math.max(0, fadeLeft - (Date.now() - fadeStart)); clearTimeout(fadeTimer); cancelAnimationFrame(fadeRAF); });
+$("pop").addEventListener("pointerleave", () => { if(P.open) runFade(); });
+
+/* ---------- buttons ---------- */
+$("closeBtn").onclick = () => hide(false);
+addEventListener("keydown", e => { if(e.key === "Escape" && P.open) hide(false); });
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => { setGenre(t.dataset.g, t.dataset.g === S.genre); restartFade(); }));
+$("snoozeBtn").onclick = () => { invoke("snooze"); toast("Snoozed. No more quotes until tomorrow."); setTimeout(() => hide(false), 900); };
+function react(up){
+  if(P.reacted) return; P.reacted = true;
+  $(up ? "upBtn" : "downBtn").setAttribute("aria-pressed","true");
+  invoke("react", {up}).then(m => m && toast(m));
+  setTimeout(() => { $("react").classList.add("gone"); setTimeout(() => $("react").hidden = true, 260); }, 450);
+}
+$("upBtn").onclick = () => react(true);
+$("downBtn").onclick = () => react(false);
+$("reportBtn").onclick = () => { if(reportCurrent()) toast("Reported. This quote won't show again."); };
+
+/* ---------- move and resize the window by dragging the card or its edges ---------- */
+const EDGE = 10, CORNER = 22;
+function edgeAt(e){
+  const w = innerWidth, h = innerHeight, x = e.clientX, y = e.clientY;
+  const nearL = x < CORNER, nearR = x > w - CORNER, nearT = y < CORNER, nearB = y > h - CORNER;
+  if(nearT && nearL) return "NorthWest"; if(nearT && nearR) return "NorthEast";
+  if(nearB && nearL) return "SouthWest"; if(nearB && nearR) return "SouthEast";
+  if(x < EDGE) return "West"; if(x > w - EDGE) return "East"; if(y < EDGE) return "North"; if(y > h - EDGE) return "South";
+  return null;
+}
+const CURSORS = {North:"ns-resize", South:"ns-resize", East:"ew-resize", West:"ew-resize", NorthEast:"nesw-resize", SouthWest:"nesw-resize", NorthWest:"nwse-resize", SouthEast:"nwse-resize"};
+document.addEventListener("pointermove", e => { const d = edgeAt(e); $("pop").style.cursor = d ? CURSORS[d] : ""; });
+document.addEventListener("pointerdown", e => {
+  if(!win || e.button !== 0 || e.target.closest("button")) return;
+  const d = edgeAt(e);
+  if(d) win.startResizeDragging(d); else win.startDragging();
+});
+</script>
+</body>
+</html>

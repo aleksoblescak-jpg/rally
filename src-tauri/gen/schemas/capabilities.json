@@ -1,0 +1,1 @@
+{"default":{"identifier":"default","description":"What Rally's two windows may do","local":true,"windows":["popup","settings"],"permissions":["core:default","core:window:allow-start-dragging","core:window:allow-start-resize-dragging","core:window:allow-hide","core:window:allow-show"]}}

@@ -1,0 +1,35 @@
+@font-face{font-family:"Instrument Serif";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/instrument-serif-latin-400-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Instrument Serif";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/instrument-serif-latin-ext-400-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Geist";font-weight:400;font-display:swap;src:url(fonts/geist-sans-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Geist";font-weight:500;font-display:swap;src:url(fonts/geist-sans-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:"Geist";font-weight:600;font-display:swap;src:url(fonts/geist-sans-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:"Geist Mono";font-weight:400;font-display:swap;src:url(fonts/geist-mono-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Geist Mono";font-weight:500;font-display:swap;src:url(fonts/geist-mono-latin-500-normal.woff2) format("woff2")}
+
+:root{
+  --ink:#f3f1ee; --ink-soft:rgba(243,241,238,.72); --ink-faint:rgba(243,241,238,.48);
+  --glass:rgba(255,255,255,.10); --glass-strong:rgba(255,255,255,.18); --glass-edge:rgba(255,255,255,.30);
+  --panel:#1a212c; --good:#8fd1a5; --warn:#f0c27a; --hot:#f08f7a;
+  --f-quote:"Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --f-ui:"Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0; height:100%}
+body{color:var(--ink); font-family:var(--f-ui); -webkit-font-smoothing:antialiased}
+button{font:inherit; color:inherit; cursor:pointer}
+:focus-visible{outline:2px solid #fff; outline-offset:2px}
+.glass-btn{
+  border:0; background:var(--glass); color:var(--ink);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35), inset 0 0 0 1px rgba(255,255,255,.18);
+  border-radius:99px; height:30px; display:inline-flex; align-items:center; justify-content:center;
+  transition:background .2s, transform .15s;
+}
+.glass-btn:hover{background:var(--glass-strong)}
+.glass-btn:active{transform:scale(.94)}
+.close{width:30px; font-size:15px; line-height:1}
+.toast{position:fixed; z-index:30; left:50%; bottom:16px; transform:translateX(-50%); background:rgba(20,24,32,.92); border:1px solid rgba(255,255,255,.12); padding:9px 14px; border-radius:10px; font-size:12.5px; transition:opacity .3s; max-width:calc(100% - 32px); text-align:center}
+.toast.hide{opacity:0; pointer-events:none}
+@media (prefers-reduced-motion:reduce){ *{transition:none!important} }

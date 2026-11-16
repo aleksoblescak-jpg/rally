@@ -1,0 +1,12 @@
+{
+  "name": "rally",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": { "tauri": "tauri" },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "@fontsource/instrument-serif": "^5",
+    "@fontsource/geist-sans": "^5",
+    "@fontsource/geist-mono": "^5"
+  }
+}

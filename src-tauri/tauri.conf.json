@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Rally",
+  "version": "1.0.0",
+  "identifier": "app.rally.quotes",
+  "build": { "frontendDist": "../ui" },
+  "app": {
+    "withGlobalTauri": true,
+    "macOSPrivateApi": true,
+    "windows": [
+      {
+        "label": "popup", "url": "popup.html", "title": "Rally",
+        "width": 400, "height": 470, "minWidth": 300, "minHeight": 300,
+        "decorations": false, "transparent": true, "shadow": false,
+        "alwaysOnTop": true, "skipTaskbar": true, "resizable": true,
+        "visible": false, "focus": false
+      },
+      {
+        "label": "settings", "url": "settings.html", "title": "Rally",
+        "width": 470, "height": 860, "minWidth": 400, "minHeight": 520,
+        "visible": false, "center": true
+      }
+    ],
+    "security": { "csp": null }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "publisher": "Rally",
+    "shortDescription": "A motivational quote when you need it",
+    "category": "Productivity",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
+    "windows": { "nsis": { "installMode": "currentUser" } },
+    "macOS": { "minimumSystemVersion": "11.0" }
+  }
+}
