@@ -937,7 +937,8 @@ const QUOTES = [{"g":"business","text":"Remember that time is money.","name":"Be
 {"g":"history","text":"Luck is the residue of design.","name":"Branch Rickey","src":"The Sporting News, 21 February 1946 (Rickey also said it in 1915, Lexington Leader, per Quote Investigator)","date":"21 February 1946","img":"gen_branch_rickey","pos":"50% 22%"},
 {"g":"history","text":"For myself I am never satisfied — never really. I almost always fail — always I think: now next time I can do it. Maybe that is part of what keeps one working.","name":"Georgia O'Keeffe","src":"Letter to William Howard Schubart, Abiquiu, quoted in Mara R. Witzling (ed.), Voicing Our Visions (1991), p. 228","date":"4 August 1950","img":"gen_georgia_o_keeffe","pos":"50% 22%"},
 {"g":"history","text":"I know that, if I have to master some subject, I just sit down and work at that thing till I can do it—till it is done.","name":"Anna Case","src":"Interview, as recorded by Harriette Brower, Vocal Mastery (1920), \"Inspired Interpretation\"","date":"c. 1919","img":"gen_anna_case","pos":"50% 22%"},
-{"g":"history","text":"There ain't no man can avoid being born average. But there ain't no man got to be common.","name":"Satchel Paige","src":"As recorded by Jim Raglin, \"Change of Pace\", Lincoln Evening Journal and Nebraska State Journal (26 July 1958), p. 8","date":"1958","img":"gen_satchel_paige","pos":"50% 22%"}];
+{"g":"history","text":"There ain't no man can avoid being born average. But there ain't no man got to be common.","name":"Satchel Paige","src":"As recorded by Jim Raglin, \"Change of Pace\", Lincoln Evening Journal and Nebraska State Journal (26 July 1958), p. 8","date":"1958","img":"gen_satchel_paige","pos":"50% 22%"},
+{"g":"ancient","text":"The die is cast.","name":"Julius Caesar","src":"Crossing the Rubicon, reported by Plutarch, Life of Caesar 32 (Dryden tr., rev. A. H. Clough)","date":"49 BC","img":"gen_caesar","pos":"50% 22%"}];
 const CREDITS = {
 "franklin": {
 "who": "Benjamin Franklin",
@@ -4065,6 +4066,13 @@ const CREDITS = {
 "who": "Satchel Paige",
 "file": "Negro League pitcher at sunset",
 "by": "AI-generated illustration (1950s magazine illustration)",
+"lic": "AI illustration",
+"url": ""
+},
+"caesar": {
+"who": "Julius Caesar",
+"file": "Battle of Zela, 47 BC",
+"by": "AI-generated illustration (Roman floor mosaic)",
 "lic": "AI illustration",
 "url": ""
 }
