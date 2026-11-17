@@ -84,13 +84,13 @@ footer{margin-top:64px; font-size:13px; color:var(--ink-faint); line-height:1.6}
       <h1>A quote when you need a push.</h1>
       <p class="lead">Rally sits quietly in the corner of your screen. When it notices your focus dipping (a string of pauses, slower typing, the afternoon slump) it shows you one motivational quote. Once a day, never more.</p>
       <div class="cta">
-        <a class="btn primary" id="mainBtn" href="downloads/Rally-1.0.1-mac.dmg" download>
+        <a class="btn primary" id="mainBtn" href="downloads/Rally-1.0.2-mac.dmg" download>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
           <span id="mainLabel">Download for Mac</span>
         </a>
-        <a class="btn ghost" id="altBtn" href="downloads/Rally-1.0.1-windows-setup.exe" download><span id="altLabel">Download for Windows</span></a>
+        <a class="btn ghost" id="altBtn" href="downloads/Rally-1.0.2-windows-setup.exe" download><span id="altLabel">Download for Windows</span></a>
       </div>
-      <p class="meta" id="metaLine">Free · Version 1.0.1 · Mac (Apple Silicon &amp; Intel) and Windows 10/11 · Works offline</p>
+      <p class="meta" id="metaLine">Free · Version 1.0.2 · Mac (Apple Silicon &amp; Intel) and Windows 10/11 · Works offline</p>
     </div>
     <div class="shot"><img src="popup.webp" width="400" height="470" alt="The Rally popup: a Van Gogh quote over a painting of a sower in a golden field, with genre tabs underneath"></div>
   </section>
@@ -133,8 +133,8 @@ footer{margin-top:64px; font-size:13px; color:var(--ink-faint); line-height:1.6}
   const isWin = /Win/i.test(plat) || /Windows/i.test(ua);
   if(!isWin) return;
   const main = document.getElementById("mainBtn"), alt = document.getElementById("altBtn");
-  main.href = "downloads/Rally-1.0.1-windows-setup.exe"; document.getElementById("mainLabel").textContent = "Download for Windows";
-  alt.href = "downloads/Rally-1.0.1-mac.dmg"; document.getElementById("altLabel").textContent = "Download for Mac";
+  main.href = "downloads/Rally-1.0.2-windows-setup.exe"; document.getElementById("mainLabel").textContent = "Download for Windows";
+  alt.href = "downloads/Rally-1.0.2-mac.dmg"; document.getElementById("altLabel").textContent = "Download for Mac";
   const ms = document.getElementById("macSteps"), ws = document.getElementById("winSteps"); ws.parentNode.insertBefore(ws, ms);
 })();
 </script>
